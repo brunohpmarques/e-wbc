@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">e-WBC</string>
+    <string name="start">Iniciar</string>
+    <string name="connecting">Conectando</string>
+    <string name="connected">Conectado</string>
+    <string name="connFail">Falha na conexão</string>
 </resources>
