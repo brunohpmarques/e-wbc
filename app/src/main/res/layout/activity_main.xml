@@ -10,16 +10,23 @@
         android:id="@+id/commLayout"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="85dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:background="@drawable/borderbottom_gray">
-        <ListView
-            android:id="@+id/commList"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <!--<ListView-->
+            <!--android:id="@+id/commList"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent">-->
 
-        </ListView>
+        <!--</ListView>-->
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:id="@+id/horizontalList">
+
+        </android.support.v7.widget.RecyclerView>
     </RelativeLayout>
 
     <RelativeLayout
