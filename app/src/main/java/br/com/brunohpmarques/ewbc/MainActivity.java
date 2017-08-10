@@ -1,26 +1,27 @@
 package br.com.brunohpmarques.ewbc;
 
-import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import br.com.brunohpmarques.ewbc.adapters.CommandAdapter;
 import br.com.brunohpmarques.ewbc.adapters.CommandOptionAdapter;
 import br.com.brunohpmarques.ewbc.models.CommandOption;
 
 public class MainActivity extends AppCompatActivity {
 
+    /**Lista de comandos disponiveis*/
     private List<CommandOption> commandOptionList;
-    private LinearLayoutManager layoutManager;
+    /**Lista de comandos a serem enviados*/
+    private List<CommandOption> mainList;
+    private LinearLayoutManager horizontalLayoutManager, verticalLayoutManager;
     private RecyclerView horizontalList;
+    private RecyclerView verticalList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,14 +39,32 @@ public class MainActivity extends AppCompatActivity {
             commandOption = new CommandOption(commOps[i], commRes[i]);
             commandOptionList.add(commandOption);
         }
+        this.mainList = new ArrayList<>();
+        this.mainList.add(commandOptionList.get(0));
+        this.mainList.add(commandOptionList.get(3));
+        this.mainList.add(commandOptionList.get(4));
+        this.mainList.add(commandOptionList.get(0));
+        this.mainList.add(commandOptionList.get(1));
+        this.mainList.add(commandOptionList.get(0));
+        this.mainList.add(commandOptionList.get(3));
+        this.mainList.add(commandOptionList.get(0));
+        this.mainList.add(commandOptionList.get(5));
 
         // Layout
-        this.layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        this.horizontalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         this.horizontalList = (RecyclerView) findViewById(R.id.horizontalList);
         if (commandOptionList.size() > 0 & horizontalList != null) {
             horizontalList.setAdapter(new CommandOptionAdapter(commandOptionList));
         }
-        horizontalList.setLayoutManager(layoutManager);
+        horizontalList.setLayoutManager(horizontalLayoutManager);
+
+        this.verticalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        this.verticalList = (RecyclerView) findViewById(R.id.verticalList);
+        if (this.mainList.size() > 0 & verticalList != null) {
+            Collections.reverse(this.mainList);
+            verticalList.setAdapter(new CommandAdapter(this.mainList));
+        }
+        verticalList.setLayoutManager(verticalLayoutManager);
         //
     }
 
