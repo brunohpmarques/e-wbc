@@ -1,14 +1,18 @@
 package br.com.brunohpmarques.ewbc.holders;
 
 import android.media.Image;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import br.com.brunohpmarques.ewbc.MainActivity;
 import br.com.brunohpmarques.ewbc.R;
+import br.com.brunohpmarques.ewbc.models.Command;
 
 /**
  * Created by Bruno Marques on 08/08/2017.
@@ -30,23 +34,27 @@ public class CommandHolder extends RecyclerView.ViewHolder  {
         commandRem = (ImageView) view.findViewById(R.id.btnRemComm);
         commandPos = (TextView) view.findViewById(R.id.lblCommPos);
 
-        commandImage.setOnClickListener(new View.OnClickListener() {
+        commandImage.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View view) {
-                Toast.makeText(view.getContext(), commandTitle.getText(), Toast.LENGTH_SHORT).show();
+            public boolean onLongClick(View view) {
+                Snackbar.make(view, commandTitle.getText(), Snackbar.LENGTH_SHORT).show();
+                return false;
             }
         });
         commandInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(view.getContext(), "INFO: "+commandTitle.getText(), Toast.LENGTH_SHORT).show();
+                Snackbar.make(view, "INFO: "+commandTitle.getText(), Snackbar.LENGTH_SHORT).show();
             }
         });
         commandRem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(view.getContext(), "REM: "+commandTitle.getText(), Toast.LENGTH_SHORT).show();
+                Snackbar.make(view, commandTitle.getText()+" "+view.getContext().getString(R.string.removed), Snackbar.LENGTH_SHORT).show();
+                int index = Integer.parseInt(commandPos.getText().toString());
+                MainActivity.remCommand(index);
             }
         });
+
     }
 }

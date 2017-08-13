@@ -9,8 +9,7 @@ import java.util.List;
 
 import br.com.brunohpmarques.ewbc.R;
 import br.com.brunohpmarques.ewbc.holders.CommandHolder;
-import br.com.brunohpmarques.ewbc.holders.CommandOptionHolder;
-import br.com.brunohpmarques.ewbc.models.CommandOption;
+import br.com.brunohpmarques.ewbc.models.Command;
 
 /**
  * Created by Bruno Marques on 08/08/2017.
@@ -18,9 +17,9 @@ import br.com.brunohpmarques.ewbc.models.CommandOption;
 
 public class CommandAdapter extends RecyclerView.Adapter<CommandHolder> {
 
-    private List<CommandOption> list;
+    private List<Command> list;
 
-    public CommandAdapter(List<CommandOption> Data) {
+    public CommandAdapter(List<Command> Data) {
         list = Data;
     }
 

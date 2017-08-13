@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">e-WBC</string>
     <string name="start">Iniciar</string>
+    <string name="added">adicionado</string>
+    <string name="removed">removido</string>
+    <string name="disconnected">Desconectado</string>
     <string name="connecting">Conectando</string>
     <string name="connected">Conectado</string>
     <string name="connFail">Falha na conexão</string>

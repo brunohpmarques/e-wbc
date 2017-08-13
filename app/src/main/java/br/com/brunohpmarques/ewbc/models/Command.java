@@ -1,15 +1,17 @@
 package br.com.brunohpmarques.ewbc.models;
 
+import java.io.Serializable;
+
 /**
  * Created by Bruno Marques on 08/08/2017.
  */
 
-public class CommandOption {
+public class Command implements Serializable {
     private String title;
     private String code;
     private int resourceId;
 
-    public CommandOption(String title, int resourceId) {
+    public Command(String title, int resourceId) {
         this.title = title;
         this.resourceId = resourceId;
     }

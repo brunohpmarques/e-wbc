@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+    <item android:id="@+id/btnBltConnect"
+        android:icon="@drawable/ic_bluetooth_disabled"
+        android:title="@string/disconnected"
+        app:showAsAction="always"/>
+    <item android:id="@+id/btnBltConnecting"
+        android:visible="false"
+        android:icon="@drawable/ic_bluetooth_searching"
+        android:title="@string/connecting"
+        app:showAsAction="always"/>
+    <item android:id="@+id/btnBltConnected"
+        android:visible="false"
+        android:icon="@drawable/ic_bluetooth_connected"
+        android:title="@string/connected"
+        app:showAsAction="always"/>
+</menu>

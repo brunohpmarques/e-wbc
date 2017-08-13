@@ -9,7 +9,7 @@ import java.util.List;
 
 import br.com.brunohpmarques.ewbc.R;
 import br.com.brunohpmarques.ewbc.holders.CommandOptionHolder;
-import br.com.brunohpmarques.ewbc.models.CommandOption;
+import br.com.brunohpmarques.ewbc.models.Command;
 
 /**
  * Created by Bruno Marques on 08/08/2017.
@@ -17,9 +17,9 @@ import br.com.brunohpmarques.ewbc.models.CommandOption;
 
 public class CommandOptionAdapter extends RecyclerView.Adapter<CommandOptionHolder> {
 
-    private List<CommandOption> list;
+    private List<Command> list;
 
-    public CommandOptionAdapter(List<CommandOption> Data) {
+    public CommandOptionAdapter(List<Command> Data) {
         list = Data;
     }
 
@@ -34,6 +34,7 @@ public class CommandOptionAdapter extends RecyclerView.Adapter<CommandOptionHold
     @Override
     public void onBindViewHolder(CommandOptionHolder holder, int position) {
         holder.commandTitle.setText(list.get(position).getTitle());
+        holder.commandPosition.setText(position+"");
         holder.commandImage.setImageResource(list.get(position).getResourceId());
     }
 
