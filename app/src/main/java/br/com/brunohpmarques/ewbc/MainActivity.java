@@ -1,8 +1,17 @@
 package br.com.brunohpmarques.ewbc;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Handler;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -10,6 +19,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,12 +35,15 @@ import br.com.brunohpmarques.ewbc.models.Command;
  */
 
 public class MainActivity extends AppCompatActivity {
+    private static final int REQUEST_PERMISSIONS = 543;
 
     /**Lista de comandos disponiveis*/
     private static final List<Command> commandOptionList = new ArrayList<>();
     /**Lista de comandos a serem enviados*/
     private static final List<Command> mainList = new ArrayList<>();
 
+    private View snackView;
+    private Menu menu;
     private static LinearLayoutManager horizontalLayoutManager, verticalLayoutManager;
     private static RecyclerView horizontalList;
     private static RecyclerView verticalList;
@@ -78,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_options, menu);
+        this.menu = menu;
         return true;
     }
 
@@ -85,16 +99,118 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.btnBltConnect:
+            case R.id.btnBltDisabled:
                 // conectar bluetooth
+                enableBlt();
                 return true;
             case R.id.btnBltConnected:
                 // desconectar bluetooth
+                disableBlt();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    /** Ativar bluetooth e busca o robo **/
+    private void enableBlt(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (menu != null) {
+                    MenuItem bltDisabled = menu.findItem(R.id.btnBltDisabled);
+                    MenuItem bltConnecting = menu.findItem(R.id.btnBltConnecting);
+                    if (bltDisabled != null && bltConnecting != null) {
+                        bltDisabled.setVisible(false);
+                        bltConnecting.setVisible(true);
+                        Snackbar.make(verticalList, getString(R.string.connecting), Snackbar.LENGTH_SHORT).show();
+                        new Handler().postDelayed(new Runnable(){
+                            @Override
+                            public void run() {
+                                MainActivity.this.connectBlt();
+                            }
+                        }, 3000);
+                    }
+                }
+            }
+        });
+    }
+
+    /** Desativa bluetooth **/
+    private void disableBlt(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (menu != null) {
+                    MenuItem bltDisabled = menu.findItem(R.id.btnBltDisabled);
+                    MenuItem bltConnecting = menu.findItem(R.id.btnBltConnecting);
+                    MenuItem bltConnected = menu.findItem(R.id.btnBltConnected);
+                    if (bltDisabled != null && bltConnecting != null && bltConnected != null) {
+                        bltDisabled.setVisible(true);
+                        bltConnecting.setVisible(false);
+                        bltConnected.setVisible(false);
+                        Snackbar.make(verticalList, getString(R.string.disabled), Snackbar.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+    }
+
+    /** Conecta bluetooth com robo **/
+    private void connectBlt(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (menu != null) {
+                    MenuItem bltConnecting = menu.findItem(R.id.btnBltConnecting);
+                    MenuItem bltConnected = menu.findItem(R.id.btnBltConnected);
+                    if (bltConnecting != null && bltConnected != null) {
+                        bltConnecting.setVisible(false);
+                        bltConnected.setVisible(true);
+                        Snackbar.make(verticalList, getString(R.string.connected), Snackbar.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+    }
+
+    public static void checkCoarsePermissions(Activity activity){
+        boolean isPermission = false;
+        if(Build.VERSION.SDK_INT >= 23){
+            if(ContextCompat.checkSelfPermission(activity, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+
+                // Se o usuario ja negou a permissao
+                if(ActivityCompat.shouldShowRequestPermissionRationale(activity, android.Manifest.permission.ACCESS_COARSE_LOCATION)){
+                    // Explicar o uso da permissao com um dialog
+                }
+                ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_PERMISSIONS);
+
+            }else{
+                // ja tem permissao
+                isPermission = true;
+            }
+        }else{
+            // eh menor do que a API 23, ou seja, ja tem permissao desde a instalacao
+            isPermission = true;
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkCoarsePermissions(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
 
     /** Adiciona comando na lista a ser enviada para o robo **/
     public static void addCommand(Command command){
