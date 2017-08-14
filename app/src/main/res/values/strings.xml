@@ -8,4 +8,7 @@
     <string name="connecting">Conectando</string>
     <string name="connected">Conectado</string>
     <string name="connFail">Falha na conexão</string>
+    <string name="listEmpty">Adicione um comando na lista</string>
+    <string name="alreadySending">Aguarde o envio atual terminar</string>
+    <string name="sending">Enviando</string>
 </resources>

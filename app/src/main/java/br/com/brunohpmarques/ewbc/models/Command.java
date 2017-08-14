@@ -9,10 +9,13 @@ import java.io.Serializable;
 public class Command implements Serializable {
     private String title;
     private String code;
+    private String param;
     private int resourceId;
 
     public Command(String title, int resourceId) {
         this.title = title;
+        this.code = title.replace(" ", "").toUpperCase();
+        this.param = "";
         this.resourceId = resourceId;
     }
 
@@ -38,5 +41,13 @@ public class Command implements Serializable {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getParam() {
+        return param;
+    }
+
+    public String setParam(String param) {
+        return this.param = param;
     }
 }

@@ -1,6 +1,7 @@
 package br.com.brunohpmarques.ewbc;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -20,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,12 +43,20 @@ public class MainActivity extends AppCompatActivity {
     private static final List<Command> commandOptionList = new ArrayList<>();
     /**Lista de comandos a serem enviados*/
     private static final List<Command> mainList = new ArrayList<>();
+    private static boolean isSending;
 
-    private View snackView;
-    private Menu menu;
+    private static MainActivity mainInstance;
     private static LinearLayoutManager horizontalLayoutManager, verticalLayoutManager;
     private static RecyclerView horizontalList;
     private static RecyclerView verticalList;
+    private static ProgressDialog progressDialog;
+
+    private Menu menu;
+    private Button btnStart;
+
+    public static MainActivity getInstance(){
+        return mainInstance;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
 //        Toolbar myToolbar = (Toolbar) findViewById(R.id.mainToolbar);
 //        setSupportActionBar(myToolbar);
 
+        // Comandos
         if(commandOptionList != null) commandOptionList.clear();
         if(mainList != null) mainList.clear();
 
@@ -69,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
             commandOption = new Command(commOps[i], commRes[i]);
             commandOptionList.add(commandOption);
         }
+        //
 
         // Layout
         this.horizontalLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -84,6 +96,14 @@ public class MainActivity extends AppCompatActivity {
             verticalList.setAdapter(new CommandAdapter(this.mainList));
         }
         verticalList.setLayoutManager(verticalLayoutManager);
+
+        this.btnStart = (Button) findViewById(R.id.btnStart);
+        this.btnStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendCommands();
+            }
+        });
         //
     }
 
@@ -198,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        MainActivity.mainInstance = this;
         checkCoarsePermissions(this);
     }
 
@@ -239,5 +260,58 @@ public class MainActivity extends AppCompatActivity {
             command = MainActivity.commandOptionList.get(index);
         }
         return command;
+    }
+
+    /** Retorna lista de comandos disponiveis **/
+    public static void sendCommands(){
+        if(MainActivity.mainList != null && !MainActivity.mainList.isEmpty()) {
+            if (!MainActivity.isSending) {
+                MainActivity.isSending = true;
+                showProgress(R.string.sending);
+
+                Command comm;
+                String message;
+                int total = MainActivity.mainList.size();
+                for (int i = total-1; i>=0; i--) {
+                    comm = MainActivity.mainList.get(i);
+                    message = comm.getCode()+"#"+comm.getParam();
+                    Log.i("sendCommands", (total-i)+"/"+total+": "+message);
+                    // TODO enviar comandos via bluetooth
+                    MainActivity.progressDialog.setMessage((total-i)+"/"+total+": "+message);
+//                    MainActivity.closeProgress();
+//                    MainActivity.isSending = false;
+                }
+
+
+                // Apagar depois
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.closeProgress();
+                        MainActivity.isSending = false;
+                    }
+                }, 3000);
+                //
+
+
+            }else{
+                Snackbar.make(verticalList, verticalList.getContext().getString(R.string.alreadySending), Snackbar.LENGTH_SHORT).show();
+            }
+        }else{
+            Snackbar.make(verticalList, verticalList.getContext().getString(R.string.listEmpty), Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    public static void showProgress(int stringId){
+        if(MainActivity.progressDialog == null) {
+            MainActivity.progressDialog = ProgressDialog.show(MainActivity.getInstance(), verticalList.getContext().getString(stringId), "", true);
+        }
+    }
+
+    public static void closeProgress(){
+        if(MainActivity.progressDialog != null){
+            MainActivity.progressDialog.dismiss();
+            MainActivity.progressDialog = null;
+        }
     }
 }
