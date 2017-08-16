@@ -6,6 +6,11 @@
         android:icon="@drawable/ic_bluetooth_disabled"
         android:title="@string/disabled"
         app:showAsAction="always"/>
+    <item android:id="@+id/btnBltActivated"
+        android:visible="false"
+        android:icon="@drawable/ic_bluetooth"
+        android:title="@string/activated"
+        app:showAsAction="always"/>
     <item android:id="@+id/btnBltConnecting"
         android:visible="false"
         android:icon="@drawable/ic_bluetooth_searching"

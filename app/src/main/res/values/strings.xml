@@ -3,8 +3,10 @@
     <string name="start">Iniciar</string>
     <string name="added">adicionado</string>
     <string name="removed">removido</string>
-    <string name="activated">Ativado</string>
-    <string name="disabled">Desativado</string>
+    <string name="activated">Bluetooth Ativado</string>
+    <string name="disabled">Bluetooth Desativado</string>
+    <string name="notConnected">Conecte com o e-WBC</string>
+    <string name="searching">Buscando</string>
     <string name="connecting">Conectando</string>
     <string name="connected">Conectado</string>
     <string name="connFail">Falha na conexão</string>

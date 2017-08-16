@@ -2,12 +2,14 @@ package br.com.brunohpmarques.ewbc;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -34,6 +36,7 @@ import java.util.logging.Logger;
 
 import br.com.brunohpmarques.ewbc.adapters.CommandAdapter;
 import br.com.brunohpmarques.ewbc.adapters.CommandOptionAdapter;
+import br.com.brunohpmarques.ewbc.bluetooth.BluetoothHC;
 import br.com.brunohpmarques.ewbc.models.Command;
 import br.com.brunohpmarques.ewbc.models.ECommandCode;
 
@@ -42,14 +45,14 @@ import br.com.brunohpmarques.ewbc.models.ECommandCode;
  */
 
 public class MainActivity extends AppCompatActivity {
+    public static BluetoothHC bt;
+    public static final String TAG = Command.class.getSimpleName().toUpperCase()+"_TAG";
     private static final int REQUEST_PERMISSIONS = 543;
-
     /**Lista de comandos disponiveis*/
     private static final List<Command> commandOptionList = new ArrayList<>();
     /**Lista de comandos a serem enviados*/
     private static final List<Command> mainList = new ArrayList<>();
     private static boolean isSending;
-    private static boolean isShowingDialog;
 
     private static MainActivity mainInstance;
     private static LinearLayoutManager horizontalLayoutManager, verticalLayoutManager;
@@ -60,6 +63,30 @@ public class MainActivity extends AppCompatActivity {
     private Menu menu;
     private Button btnStart;
 
+    //////////////////////////////////////////////
+    private static final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case BluetoothHC.MESSAGE_STATE_CHANGE:
+                    Log.d(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+                    break;
+                case BluetoothHC.MESSAGE_WRITE:
+                    Log.d(TAG, "MESSAGE_WRITE ");
+                    break;
+                case BluetoothHC.MESSAGE_READ:
+                    Log.d(TAG, "MESSAGE_READ ");
+                    break;
+                case BluetoothHC.MESSAGE_DEVICE_NAME:
+                    Log.d(TAG, "MESSAGE_DEVICE_NAME "+msg);
+                    break;
+                case BluetoothHC.MESSAGE_TOAST:
+                    Log.d(TAG, "MESSAGE_TOAST "+msg);
+                    break;
+            }
+        }
+    };
+
     public static MainActivity getInstance(){
         return mainInstance;
     }
@@ -69,8 +96,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-//        Toolbar myToolbar = (Toolbar) findViewById(R.id.mainToolbar);
-//        setSupportActionBar(myToolbar);
+        MainActivity.bt = new BluetoothHC(this, mHandler, BluetoothAdapter.getDefaultAdapter());
 
         // Comandos
         if(commandOptionList != null) commandOptionList.clear();
@@ -122,11 +148,19 @@ public class MainActivity extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.btnBltDisabled:
-                // conectar bluetooth
+                // bluetooth desativado
                 enableBlt();
                 return true;
+            case R.id.btnBltActivated:
+                // bluetooth ativado
+                connectBlt();
+                return true;
+            case R.id.btnBltConnecting:
+                // conectando com o robo
+                disableBlt();
+                return true;
             case R.id.btnBltConnected:
-                // desconectar bluetooth
+                // bluetooth conectado com o robo
                 disableBlt();
                 return true;
             default:
@@ -136,22 +170,21 @@ public class MainActivity extends AppCompatActivity {
 
     /** Ativar bluetooth e busca o robo **/
     private void enableBlt(){
+        bt.on();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (menu != null) {
                     MenuItem bltDisabled = menu.findItem(R.id.btnBltDisabled);
+                    MenuItem bltActivated = menu.findItem(R.id.btnBltActivated);
                     MenuItem bltConnecting = menu.findItem(R.id.btnBltConnecting);
-                    if (bltDisabled != null && bltConnecting != null) {
+                    MenuItem bltConnected = menu.findItem(R.id.btnBltConnected);
+                    if (bltDisabled != null && bltActivated != null && bltConnecting != null && bltConnected != null) {
                         bltDisabled.setVisible(false);
-                        bltConnecting.setVisible(true);
+                        bltActivated.setVisible(true);
+                        bltConnecting.setVisible(false);
+                        bltConnected.setVisible(false);
                         Snackbar.make(verticalList, getString(R.string.connecting), Snackbar.LENGTH_SHORT).show();
-                        new Handler().postDelayed(new Runnable(){
-                            @Override
-                            public void run() {
-                                MainActivity.this.connectBlt();
-                            }
-                        }, 3000);
                     }
                 }
             }
@@ -160,15 +193,18 @@ public class MainActivity extends AppCompatActivity {
 
     /** Desativa bluetooth **/
     private void disableBlt(){
+        bt.off();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (menu != null) {
                     MenuItem bltDisabled = menu.findItem(R.id.btnBltDisabled);
+                    MenuItem bltActivated = menu.findItem(R.id.btnBltActivated);
                     MenuItem bltConnecting = menu.findItem(R.id.btnBltConnecting);
                     MenuItem bltConnected = menu.findItem(R.id.btnBltConnected);
-                    if (bltDisabled != null && bltConnecting != null && bltConnected != null) {
+                    if (bltDisabled != null && bltActivated != null && bltConnecting != null && bltConnected != null) {
                         bltDisabled.setVisible(true);
+                        bltActivated.setVisible(false);
                         bltConnecting.setVisible(false);
                         bltConnected.setVisible(false);
                         Snackbar.make(verticalList, getString(R.string.disabled), Snackbar.LENGTH_SHORT).show();
@@ -180,13 +216,18 @@ public class MainActivity extends AppCompatActivity {
 
     /** Conecta bluetooth com robo **/
     private void connectBlt(){
+        bt.findDevices(MainActivity.this);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (menu != null) {
+                    MenuItem bltDisabled = menu.findItem(R.id.btnBltDisabled);
+                    MenuItem bltActivated = menu.findItem(R.id.btnBltActivated);
                     MenuItem bltConnecting = menu.findItem(R.id.btnBltConnecting);
                     MenuItem bltConnected = menu.findItem(R.id.btnBltConnected);
-                    if (bltConnecting != null && bltConnected != null) {
+                    if (bltDisabled != null && bltActivated != null && bltConnecting != null && bltConnected != null) {
+                        bltDisabled.setVisible(false);
+                        bltActivated.setVisible(false);
                         bltConnecting.setVisible(false);
                         bltConnected.setVisible(true);
                         Snackbar.make(verticalList, getString(R.string.connected), Snackbar.LENGTH_SHORT).show();
@@ -235,8 +276,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showCommandInfo(int position, Command command){
+
+        // TODO trocar por activity
+
         Context ctx = MainActivity.getInstance();
-        if(!MainActivity.isShowingDialog && ctx != null){
+        if(ctx != null){
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(ctx, R.layout.adapter_string);
             adapter.add(command.getInfo(ctx));
 
@@ -246,22 +290,19 @@ public class MainActivity extends AppCompatActivity {
                             new DialogInterface.OnClickListener(){
                                 public void onClick(DialogInterface dialog, int id){
                                     dialog.dismiss();
-                                    MainActivity.isShowingDialog = false;
                                     /// TODO
                                 }
                             })
                     .setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override
                         public void onCancel(DialogInterface dialogInterface) {
-                            MainActivity.isShowingDialog = false;
-                            /// TODO
                         }
                     });
             alertDialogBuilder.setAdapter(adapter, null);
             alertDialogBuilder.setTitle(position+": "+command.getTitle());
             AlertDialog alert = alertDialogBuilder.create();
+            alert.getListView().deferNotifyDataSetChanged();
             alert.show();
-            isShowingDialog = true;
         }
     }
 
@@ -306,37 +347,47 @@ public class MainActivity extends AppCompatActivity {
     /** Retorna lista de comandos disponiveis **/
     public static void sendCommands(){
         if(MainActivity.mainList != null && !MainActivity.mainList.isEmpty()) {
-            if (!MainActivity.isSending) {
-                MainActivity.isSending = true;
-                showProgress(R.string.sending);
+            if(bt.isOn()) {
+                if(bt.isConected()) {
+                    if(!MainActivity.isSending) {
+                        MainActivity.isSending = true;
+                        showProgress(R.string.sending);
 
-                Command comm;
-                String message;
-                int total = MainActivity.mainList.size();
-                for (int i = total-1; i>=0; i--) {
-                    comm = MainActivity.mainList.get(i);
-                    message = comm.getCode()+"#"+comm.getParam();
-                    Log.i("sendCommands", (total-i)+"/"+total+": "+message);
-                    // TODO enviar comandos via bluetooth
-                    MainActivity.progressDialog.setMessage((total-i)+"/"+total+": "+message);
-//                    MainActivity.closeProgress();
-//                    MainActivity.isSending = false;
-                }
+                        String message;
+                        int total = MainActivity.mainList.size();
 
+                        // Enviar 1 a 1
+        //              Command comm;
+        //              for (int i = total-1; i>=0; i--) {
+        //                  comm = MainActivity.mainList.get(i);
+        //                  message = comm.getCodeFormatted();
+        //                  Log.i("sendCommands", (total-i)+"/"+total+": "+message);
+        //                  bt.sendMessage(message);
+        //                  MainActivity.progressDialog.setMessage((total-i)+"/"+total+": "+message);
+        //              }
+                        //
 
-                // Apagar depois
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
+                        // Enviar todos de 1 vez
+                        message = "[";
+                        for (int i = total - 1; i >= 0; i--) {
+                            message += "\"" + MainActivity.mainList.get(i).getCodeFormatted() + "\",";
+                        }
+                        message = message.substring(0, message.length() - 1);
+                        message = message + "]";
+                        Log.i("sendCommands", total + ": " + message);
+                        bt.sendMessage(message);
+
                         MainActivity.closeProgress();
                         MainActivity.isSending = false;
+                        //
+                    } else {
+                        Snackbar.make(verticalList, verticalList.getContext().getString(R.string.alreadySending), Snackbar.LENGTH_SHORT).show();
                     }
-                }, 3000);
-                //
-
-
+                } else {
+                    Snackbar.make(verticalList, verticalList.getContext().getString(R.string.notConnected), Snackbar.LENGTH_SHORT).show();
+                }
             }else{
-                Snackbar.make(verticalList, verticalList.getContext().getString(R.string.alreadySending), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(verticalList, verticalList.getContext().getString(R.string.disabled), Snackbar.LENGTH_SHORT).show();
             }
         }else{
             Snackbar.make(verticalList, verticalList.getContext().getString(R.string.listEmpty), Snackbar.LENGTH_SHORT).show();
