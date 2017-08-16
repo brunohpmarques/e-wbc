@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import br.com.brunohpmarques.ewbc.adapters.CommandAdapter;
 import br.com.brunohpmarques.ewbc.adapters.CommandOptionAdapter;
 import br.com.brunohpmarques.ewbc.bluetooth.BluetoothHC;
+import br.com.brunohpmarques.ewbc.bluetooth.BluetoothReceive;
 import br.com.brunohpmarques.ewbc.models.Command;
 import br.com.brunohpmarques.ewbc.models.ECommandCode;
 
@@ -46,6 +47,8 @@ import br.com.brunohpmarques.ewbc.models.ECommandCode;
 
 public class MainActivity extends AppCompatActivity {
     public static BluetoothHC bt;
+    public static BluetoothReceive bluetoothReceive;
+    public static Menu menu;
     public static final String TAG = Command.class.getSimpleName().toUpperCase()+"_TAG";
     private static final int REQUEST_PERMISSIONS = 543;
     /**Lista de comandos disponiveis*/
@@ -59,9 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private static RecyclerView horizontalList;
     private static RecyclerView verticalList;
     private static ProgressDialog progressDialog;
-
-    private Menu menu;
-    private Button btnStart;
+    private static Button btnStart;
 
     //////////////////////////////////////////////
     private static final Handler mHandler = new Handler() {
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         MainActivity.bt = new BluetoothHC(this, mHandler, BluetoothAdapter.getDefaultAdapter());
+        MainActivity.bluetoothReceive = new BluetoothReceive();
 
         // Comandos
         if(commandOptionList != null) commandOptionList.clear();
@@ -149,92 +151,80 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.btnBltDisabled:
                 // bluetooth desativado
-                enableBlt();
+                bt.on();
                 return true;
             case R.id.btnBltActivated:
                 // bluetooth ativado
-                connectBlt();
+                bt.findDevices(MainActivity.this);
                 return true;
             case R.id.btnBltConnecting:
                 // conectando com o robo
-                disableBlt();
+                bt.off();
                 return true;
             case R.id.btnBltConnected:
                 // bluetooth conectado com o robo
-                disableBlt();
+                bt.off();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    /** Ativar bluetooth e busca o robo **/
-    private void enableBlt(){
-        bt.on();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (menu != null) {
+    public static void setIcBluetooth(final int btnBltId){
+        if (menu != null) {
+            final MainActivity activity = MainActivity.getInstance();
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
                     MenuItem bltDisabled = menu.findItem(R.id.btnBltDisabled);
                     MenuItem bltActivated = menu.findItem(R.id.btnBltActivated);
                     MenuItem bltConnecting = menu.findItem(R.id.btnBltConnecting);
                     MenuItem bltConnected = menu.findItem(R.id.btnBltConnected);
                     if (bltDisabled != null && bltActivated != null && bltConnecting != null && bltConnected != null) {
-                        bltDisabled.setVisible(false);
-                        bltActivated.setVisible(true);
-                        bltConnecting.setVisible(false);
-                        bltConnected.setVisible(false);
-                        Snackbar.make(verticalList, getString(R.string.connecting), Snackbar.LENGTH_SHORT).show();
+                        switch (btnBltId) {
+                            case R.id.btnBltDisabled:
+                                // bluetooth desativado
+                                bltDisabled.setVisible(true);
+                                bltActivated.setVisible(false);
+                                bltConnecting.setVisible(false);
+                                bltConnected.setVisible(false);
+                                Snackbar.make(verticalList, activity.getApplicationContext()
+                                        .getString(R.string.disabled), Snackbar.LENGTH_SHORT).show();
+                                return;
+                            case R.id.btnBltActivated:
+                                // bluetooth ativado
+                                bltDisabled.setVisible(false);
+                                bltActivated.setVisible(true);
+                                bltConnecting.setVisible(false);
+                                bltConnected.setVisible(false);
+                                Snackbar.make(verticalList, activity.getApplicationContext()
+                                        .getString(R.string.activated), Snackbar.LENGTH_SHORT).show();
+                                return;
+                            case R.id.btnBltConnecting:
+                                // conectando com o robo
+                                bltDisabled.setVisible(false);
+                                bltActivated.setVisible(false);
+                                bltConnecting.setVisible(true);
+                                bltConnected.setVisible(false);
+                                Snackbar.make(verticalList, activity.getApplicationContext()
+                                        .getString(R.string.connecting), Snackbar.LENGTH_SHORT).show();
+                                return;
+                            case R.id.btnBltConnected:
+                                // bluetooth conectado com o robo
+                                bltDisabled.setVisible(false);
+                                bltActivated.setVisible(false);
+                                bltConnecting.setVisible(false);
+                                bltConnected.setVisible(true);
+                                Snackbar.make(verticalList, activity.getApplicationContext()
+                                        .getString(R.string.connected), Snackbar.LENGTH_SHORT).show();
+                                return;
+                            default:
+                                return;
+                        }
                     }
                 }
-            }
-        });
-    }
-
-    /** Desativa bluetooth **/
-    private void disableBlt(){
-        bt.off();
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (menu != null) {
-                    MenuItem bltDisabled = menu.findItem(R.id.btnBltDisabled);
-                    MenuItem bltActivated = menu.findItem(R.id.btnBltActivated);
-                    MenuItem bltConnecting = menu.findItem(R.id.btnBltConnecting);
-                    MenuItem bltConnected = menu.findItem(R.id.btnBltConnected);
-                    if (bltDisabled != null && bltActivated != null && bltConnecting != null && bltConnected != null) {
-                        bltDisabled.setVisible(true);
-                        bltActivated.setVisible(false);
-                        bltConnecting.setVisible(false);
-                        bltConnected.setVisible(false);
-                        Snackbar.make(verticalList, getString(R.string.disabled), Snackbar.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        });
-    }
-
-    /** Conecta bluetooth com robo **/
-    private void connectBlt(){
-        bt.findDevices(MainActivity.this);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (menu != null) {
-                    MenuItem bltDisabled = menu.findItem(R.id.btnBltDisabled);
-                    MenuItem bltActivated = menu.findItem(R.id.btnBltActivated);
-                    MenuItem bltConnecting = menu.findItem(R.id.btnBltConnecting);
-                    MenuItem bltConnected = menu.findItem(R.id.btnBltConnected);
-                    if (bltDisabled != null && bltActivated != null && bltConnecting != null && bltConnected != null) {
-                        bltDisabled.setVisible(false);
-                        bltActivated.setVisible(false);
-                        bltConnecting.setVisible(false);
-                        bltConnected.setVisible(true);
-                        Snackbar.make(verticalList, getString(R.string.connected), Snackbar.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        });
+            });
+        }
     }
 
     public static void checkCoarsePermissions(Activity activity){
@@ -262,6 +252,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         MainActivity.mainInstance = this;
+        bluetoothReceive.setActivity(this);
         checkCoarsePermissions(this);
     }
 
@@ -272,6 +263,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        bluetoothReceive.unregisterReceiver();
+        bt.off();
         super.onDestroy();
     }
 

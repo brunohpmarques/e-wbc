@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import br.com.brunohpmarques.ewbc.MainActivity;
 import br.com.brunohpmarques.ewbc.R;
 
 /**
@@ -165,6 +166,7 @@ public class BluetoothHC {
         if(dialog != null && dialog.isShowing()){
             dialog.dismiss();
         }
+        MainActivity.setIcBluetooth(R.id.btnBltActivated);
     }
 
     private void connectionStart(BluetoothDevice bluetoothDevice, Activity activity){
@@ -184,7 +186,7 @@ public class BluetoothHC {
                 start();
                 if(connectDevice(bluetoothDevice)){
                     Log.d(TAG, "Btservice started - listening");
-
+                    MainActivity.setIcBluetooth(R.id.btnBltConnected);
                 }else{
                     stop();
                     Log.w(TAG, "Device is not paired");
@@ -382,6 +384,7 @@ public class BluetoothHC {
 
         bd = null;
         setState(STATE_NONE);
+        MainActivity.setIcBluetooth(R.id.btnBltActivated);
     }
 
     /**
@@ -424,6 +427,7 @@ public class BluetoothHC {
                     progressDialog.dismiss();
                 Snackbar.make(activity.getCurrentFocus(), activity.getString(R.string.connFail)+" "+bd.getName(), Snackbar.LENGTH_SHORT).show();
                 bd = null;
+                MainActivity.setIcBluetooth(R.id.btnBltActivated);
             }
         });
     }

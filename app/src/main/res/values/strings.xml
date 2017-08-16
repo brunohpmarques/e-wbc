@@ -9,6 +9,8 @@
     <string name="searching">Buscando</string>
     <string name="connecting">Conectando</string>
     <string name="connected">Conectado</string>
+    <string name="deviceNotFound">Nenhum dispositivo encontrado</string>
+    <string name="selectADevice">Selecione um dispositivo</string>
     <string name="connFail">Falha na conexão</string>
     <string name="listEmpty">Adicione um comando na lista</string>
     <string name="alreadySending">Aguarde o envio atual terminar</string>
