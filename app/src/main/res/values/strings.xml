@@ -10,5 +10,13 @@
     <string name="connFail">Falha na conexão</string>
     <string name="listEmpty">Adicione um comando na lista</string>
     <string name="alreadySending">Aguarde o envio atual terminar</string>
+    <string name="commandAC">Este comando faz o robô seguir em frente.</string>
+    <string name="commandRE">Este comando faz o robô andar para trás.</string>
+    <string name="commandDI">Este comando faz o robô virar para a direita.</string>
+    <string name="commandES">Este comando faz o robô virar para a esquerda.</string>
+    <string name="commandSU">Este comando faz o robô sugar um objeto do mapa.</string>
+    <string name="commandSO">Este comando faz o robô soltar um objeto do mapa.</string>
     <string name="sending">Enviando</string>
+    <string name="ok">Ok</string>
+    <string name="cancelar">Cancelar</string>
 </resources>

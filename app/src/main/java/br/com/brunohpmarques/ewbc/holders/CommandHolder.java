@@ -44,7 +44,10 @@ public class CommandHolder extends RecyclerView.ViewHolder  {
         commandInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "INFO: "+commandTitle.getText(), Snackbar.LENGTH_SHORT).show();
+                int position = Integer.parseInt(commandPos.getText().toString());
+                Log.e("POSICAO", ""+position);
+                Command command = MainActivity.getCommandMain(position-1);
+                MainActivity.getInstance().showCommandInfo(position, command);
             }
         });
         commandRem.setOnClickListener(new View.OnClickListener() {

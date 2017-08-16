@@ -2,6 +2,8 @@ package br.com.brunohpmarques.ewbc;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -9,6 +11,7 @@ import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
@@ -21,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 
 import java.util.ArrayList;
@@ -31,6 +35,7 @@ import java.util.logging.Logger;
 import br.com.brunohpmarques.ewbc.adapters.CommandAdapter;
 import br.com.brunohpmarques.ewbc.adapters.CommandOptionAdapter;
 import br.com.brunohpmarques.ewbc.models.Command;
+import br.com.brunohpmarques.ewbc.models.ECommandCode;
 
 /**
  * Created by Bruno Marques on 08/08/2017.
@@ -44,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     /**Lista de comandos a serem enviados*/
     private static final List<Command> mainList = new ArrayList<>();
     private static boolean isSending;
+    private static boolean isShowingDialog;
 
     private static MainActivity mainInstance;
     private static LinearLayoutManager horizontalLayoutManager, verticalLayoutManager;
@@ -70,14 +76,10 @@ public class MainActivity extends AppCompatActivity {
         if(commandOptionList != null) commandOptionList.clear();
         if(mainList != null) mainList.clear();
 
-        String commOps[] = {"Acelerar","Direita","Ré","Esquerda","Sugar","Soltar"};
-        int commRes[] = {R.drawable.ic_arrow_up, R.drawable.ic_arrow_forward,
-                R.drawable.ic_arrow_down, R.drawable.ic_arrow_back, R.drawable.ic_publish,
-                R.drawable.ic_file_download};
-
+        ECommandCode commOps[] = ECommandCode.values();
         Command commandOption;
         for(int i =0;i<commOps.length;i++){
-            commandOption = new Command(commOps[i], commRes[i]);
+            commandOption = new Command(commOps[i]);
             commandOptionList.add(commandOption);
         }
         //
@@ -232,6 +234,36 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    public void showCommandInfo(int position, Command command){
+        Context ctx = MainActivity.getInstance();
+        if(!MainActivity.isShowingDialog && ctx != null){
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(ctx, R.layout.adapter_string);
+            adapter.add(command.getInfo(ctx));
+
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ctx, R.style.DialogTheme);
+            alertDialogBuilder.setCancelable(true)
+                    .setPositiveButton(ctx.getString(R.string.ok),
+                            new DialogInterface.OnClickListener(){
+                                public void onClick(DialogInterface dialog, int id){
+                                    dialog.dismiss();
+                                    MainActivity.isShowingDialog = false;
+                                    /// TODO
+                                }
+                            })
+                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialogInterface) {
+                            MainActivity.isShowingDialog = false;
+                            /// TODO
+                        }
+                    });
+            alertDialogBuilder.setAdapter(adapter, null);
+            alertDialogBuilder.setTitle(position+": "+command.getTitle());
+            AlertDialog alert = alertDialogBuilder.create();
+            alert.show();
+            isShowingDialog = true;
+        }
+    }
 
     /** Adiciona comando na lista a ser enviada para o robo **/
     public static void addCommand(Command command){
@@ -251,6 +283,15 @@ public class MainActivity extends AppCompatActivity {
             MainActivity.mainList.remove(index);
             MainActivity.verticalList.setAdapter(new CommandAdapter(MainActivity.mainList));
         }
+    }
+
+    /** Retorna lista de comandos adicionados **/
+    public static Command getCommandMain(int index){
+        Command command = null;
+        if(index >= 0 && index < MainActivity.mainList.size()){
+            command = MainActivity.mainList.get(index);
+        }
+        return command;
     }
 
     /** Retorna lista de comandos disponiveis **/

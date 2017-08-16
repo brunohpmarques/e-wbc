@@ -1,5 +1,7 @@
 package br.com.brunohpmarques.ewbc.models;
 
+import android.content.Context;
+
 import java.io.Serializable;
 
 /**
@@ -7,40 +9,24 @@ import java.io.Serializable;
  */
 
 public class Command implements Serializable {
-    private String title;
-    private String code;
+    private ECommandCode code;
     private String param;
-    private int resourceId;
 
-    public Command(String title, int resourceId) {
-        this.title = title;
-        this.code = title.replace(" ", "").toUpperCase();
+    public Command(ECommandCode code) {
+        this.code = code;
         this.param = "";
-        this.resourceId = resourceId;
     }
 
     public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+        return code.getTitle();
     }
 
     public int getResourceId() {
-        return resourceId;
+        return code.getImageId();
     }
 
-    public void setResourceId(int resourceId) {
-        this.resourceId = resourceId;
-    }
-
-    public String getCode() {
+    public ECommandCode getCode() {
         return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public String getParam() {
@@ -49,5 +35,13 @@ public class Command implements Serializable {
 
     public String setParam(String param) {
         return this.param = param;
+    }
+
+    public String getCodeFormatted(){
+        return code.getLabel()+"#"+param;
+    }
+
+    public String getInfo(Context ctx){
+        return ctx.getString(code.getInfoId());
     }
 }
