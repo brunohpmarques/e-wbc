@@ -372,6 +372,8 @@ public class MainActivity extends AppCompatActivity {
 
                         MainActivity.closeProgress();
                         MainActivity.isSending = false;
+
+                        Snackbar.make(verticalList, verticalList.getContext().getString(R.string.sended), Snackbar.LENGTH_SHORT).show();
                         //
                     } else {
                         Snackbar.make(verticalList, verticalList.getContext().getString(R.string.alreadySending), Snackbar.LENGTH_SHORT).show();

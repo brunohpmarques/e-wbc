@@ -21,6 +21,7 @@
     <string name="commandSU">Este comando faz o robô sugar um objeto do mapa.</string>
     <string name="commandSO">Este comando faz o robô soltar um objeto do mapa.</string>
     <string name="sending">Enviando</string>
+    <string name="sended">Comandos enviandos</string>
     <string name="ok">Ok</string>
     <string name="cancelar">Cancelar</string>
 </resources>
