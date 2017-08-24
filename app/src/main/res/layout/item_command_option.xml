@@ -24,7 +24,6 @@
         <ImageView
             android:id="@+id/btnIcAddCommOp"
             android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/ic_add_circle"/>
+            android:layout_height="30dp"/>
     </RelativeLayout>
 </RelativeLayout>

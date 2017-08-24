@@ -97,11 +97,11 @@ public class BluetoothHC {
     }
 
     public boolean isOn(){
-        return mAdapter.isEnabled();
+        return mAdapter != null && mAdapter.isEnabled();
     }
 
     public void on(){
-        if(!mAdapter.isEnabled()) mAdapter.enable();
+        if(mAdapter != null && !mAdapter.isEnabled()) mAdapter.enable();
     }
 
     public void off(){

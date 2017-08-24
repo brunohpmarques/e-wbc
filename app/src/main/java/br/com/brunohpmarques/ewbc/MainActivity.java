@@ -2,17 +2,24 @@ package br.com.brunohpmarques.ewbc;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.admin.DeviceAdminInfo;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothClass;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +35,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,11 +60,15 @@ public class MainActivity extends AppCompatActivity {
     public static BluetoothHC bt;
     public static BluetoothReceive bluetoothReceive;
     public static Menu menu;
-    public static final String TAG = Command.class.getSimpleName().toUpperCase()+"_TAG";
+    public static final String TAG = Command.class.getSimpleName().toUpperCase() + "_TAG";
     private static final int REQUEST_PERMISSIONS = 543;
-    /**Lista de comandos disponiveis*/
+    /**
+     * Lista de comandos disponiveis
+     */
     private static final List<Command> commandOptionList = new ArrayList<>();
-    /**Lista de comandos a serem enviados*/
+    /**
+     * Lista de comandos a serem enviados
+     */
     private static final List<Command> mainList = new ArrayList<>();
     private static boolean isSending;
 
@@ -63,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
     private static RecyclerView verticalList;
     private static ProgressDialog progressDialog;
     private static Button btnStart;
+    private static RelativeLayout mainLayout;
+    private static LinearLayout emptyLayout;
 
     //////////////////////////////////////////////
     private static final Handler mHandler = new Handler() {
@@ -79,16 +96,16 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "MESSAGE_READ ");
                     break;
                 case BluetoothHC.MESSAGE_DEVICE_NAME:
-                    Log.d(TAG, "MESSAGE_DEVICE_NAME "+msg);
+                    Log.d(TAG, "MESSAGE_DEVICE_NAME " + msg);
                     break;
                 case BluetoothHC.MESSAGE_TOAST:
-                    Log.d(TAG, "MESSAGE_TOAST "+msg);
+                    Log.d(TAG, "MESSAGE_TOAST " + msg);
                     break;
             }
         }
     };
 
-    public static MainActivity getInstance(){
+    public static MainActivity getInstance() {
         return mainInstance;
     }
 
@@ -101,12 +118,12 @@ public class MainActivity extends AppCompatActivity {
         MainActivity.bluetoothReceive = new BluetoothReceive();
 
         // Comandos
-        if(commandOptionList != null) commandOptionList.clear();
-        if(mainList != null) mainList.clear();
+        if (commandOptionList != null) commandOptionList.clear();
+        if (mainList != null) mainList.clear();
 
         ECommandCode commOps[] = ECommandCode.values();
         Command commandOption;
-        for(int i =0;i<commOps.length;i++){
+        for (int i = 0; i < commOps.length; i++) {
             commandOption = new Command(commOps[i]);
             commandOptionList.add(commandOption);
         }
@@ -127,6 +144,11 @@ public class MainActivity extends AppCompatActivity {
         }
         verticalList.setLayoutManager(verticalLayoutManager);
 
+        this.mainLayout = (RelativeLayout) findViewById(R.id.mainLayout);
+        this.emptyLayout = (LinearLayout) findViewById(R.id.emptyLayout);
+        Drawable draw = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_add_circle, null).mutate();
+        ((ImageView) findViewById(R.id.btnEmptyLayout)).setImageDrawable(draw);
+
         this.btnStart = (Button) findViewById(R.id.btnStart);
         this.btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,6 +156,11 @@ public class MainActivity extends AppCompatActivity {
                 sendCommands();
             }
         });
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
+            Drawable roundDrawable = ResourcesCompat.getDrawable(getResources(), R.drawable.btnstart, null).mutate();
+            roundDrawable.setColorFilter(ResourcesCompat.getColor(getResources(), R.color.green, null), PorterDuff.Mode.SRC_ATOP);
+            this.btnStart.setBackground(roundDrawable);
+        }
         //
     }
 
@@ -142,32 +169,52 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_options, menu);
         this.menu = menu;
+
+        MenuItem bltDisabled = this.menu.findItem(R.id.btnBltDisabled);
+        MenuItem bltActivated = this.menu.findItem(R.id.btnBltActivated);
+        MenuItem bltConnecting = this.menu.findItem(R.id.btnBltConnecting);
+        MenuItem bltConnected = this.menu.findItem(R.id.btnBltConnected);
+
+        Drawable draw = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bluetooth_disabled, null).mutate();
+        bltDisabled.setIcon(draw);
+        draw = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bluetooth, null).mutate();
+        bltActivated.setIcon(draw);
+        draw = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bluetooth_searching, null).mutate();
+        bltConnecting.setIcon(draw);
+        draw = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bluetooth_connected, null).mutate();
+        bltConnected.setIcon(draw);
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.btnBltDisabled:
-                // bluetooth desativado
-                bt.on();
-                return true;
-            case R.id.btnBltActivated:
-                // bluetooth ativado
-                bt.findDevices(MainActivity.this);
-                return true;
-            case R.id.btnBltConnecting:
-                // conectando com o robo
-                bt.off();
-                return true;
-            case R.id.btnBltConnected:
-                // bluetooth conectado com o robo
-                bt.off();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (BluetoothAdapter.getDefaultAdapter() != null) {
+            switch (item.getItemId()) {
+                case R.id.btnBltDisabled:
+                    // bluetooth desativado
+                    bt.on();
+                    return true;
+                case R.id.btnBltActivated:
+                    // bluetooth ativado
+                    bt.findDevices(MainActivity.this);
+                    return true;
+                case R.id.btnBltConnecting:
+                    // conectando com o robo
+                    bt.off();
+                    return true;
+                case R.id.btnBltConnected:
+                    // bluetooth conectado com o robo
+                    bt.off();
+                    return true;
+                default:
+                    break;
+            }
+        } else {
+            Snackbar.make(verticalList, getString(R.string.bluetoothNotFound), Snackbar.LENGTH_SHORT).show();
         }
+        return super.onOptionsItemSelected(item);
     }
 
     public static void setIcBluetooth(final int btnBltId){
@@ -306,6 +353,10 @@ public class MainActivity extends AppCompatActivity {
             MainActivity.mainList.add(0, command);
             MainActivity.verticalList.setAdapter(new CommandAdapter(MainActivity.mainList));
             MainActivity.verticalList.scrollTo(0, 0);
+            if(MainActivity.mainList.size() == 1){
+                MainActivity.mainLayout.setVisibility(View.VISIBLE);
+                MainActivity.emptyLayout.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -316,6 +367,10 @@ public class MainActivity extends AppCompatActivity {
             Log.i("remCommand", index+"");
             MainActivity.mainList.remove(index);
             MainActivity.verticalList.setAdapter(new CommandAdapter(MainActivity.mainList));
+            if(MainActivity.mainList.isEmpty()){
+                MainActivity.mainLayout.setVisibility(View.GONE);
+                MainActivity.emptyLayout.setVisibility(View.VISIBLE);
+            }
         }
     }
 

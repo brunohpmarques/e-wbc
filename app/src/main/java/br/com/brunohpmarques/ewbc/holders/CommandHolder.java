@@ -1,7 +1,9 @@
 package br.com.brunohpmarques.ewbc.holders;
 
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +21,7 @@ import br.com.brunohpmarques.ewbc.models.Command;
  */
 
 public class CommandHolder extends RecyclerView.ViewHolder  {
-
+    private static Drawable infoDraw, removeDraw;
     public ImageButton commandImage;
     public TextView commandTitle;
     public ImageView commandInfo;
@@ -28,6 +30,13 @@ public class CommandHolder extends RecyclerView.ViewHolder  {
 
     public CommandHolder(View view) {
         super(view);
+        if(infoDraw == null){
+            infoDraw = ResourcesCompat.getDrawable(view.getResources(), R.drawable.ic_info, null).mutate();
+        }
+        if(removeDraw == null){
+            removeDraw = ResourcesCompat.getDrawable(view.getResources(), R.drawable.ic_cancel, null).mutate();
+        }
+
         commandImage = (ImageButton) view.findViewById(R.id.btnComm);
         commandTitle = (TextView) view.findViewById(R.id.lblComm);
         commandInfo = (ImageView) view.findViewById(R.id.btnInfComm);
@@ -41,6 +50,7 @@ public class CommandHolder extends RecyclerView.ViewHolder  {
                 return false;
             }
         });
+        commandInfo.setImageDrawable(infoDraw);
         commandInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -50,6 +60,7 @@ public class CommandHolder extends RecyclerView.ViewHolder  {
                 MainActivity.getInstance().showCommandInfo(position, command);
             }
         });
+        commandRem.setImageDrawable(removeDraw);
         commandRem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

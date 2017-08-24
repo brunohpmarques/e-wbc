@@ -12,7 +12,8 @@
     <string name="deviceNotFound">Nenhum dispositivo encontrado</string>
     <string name="selectADevice">Selecione um dispositivo</string>
     <string name="connFail">Falha na conexão</string>
-    <string name="listEmpty">Adicione um comando na lista</string>
+    <string name="bluetoothNotFound">Seu dispositivo não possui Bluetooth</string>
+    <string name="listEmpty">Adicione um comando tocando nas ações acima</string>
     <string name="alreadySending">Aguarde o envio atual terminar</string>
     <string name="commandAC">Este comando faz o robô seguir em frente.</string>
     <string name="commandRE">Este comando faz o robô andar para trás.</string>

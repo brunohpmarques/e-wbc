@@ -13,7 +13,8 @@
         android:layout_height="85dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        android:background="@drawable/borderbottom_gray">
+        android:background="@drawable/borderbottom_gray"
+        android:elevation="5dp">
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -23,10 +24,11 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:visibility="gone"
         android:id="@+id/mainLayout"
         android:orientation="vertical"
         android:layout_below="@id/commLayout"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="58dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <android.support.v7.widget.RecyclerView
@@ -37,22 +39,44 @@
         </android.support.v7.widget.RecyclerView>
     </RelativeLayout>
 
+    <LinearLayout
+        android:id="@+id/emptyLayout"
+        android:orientation="vertical"
+        android:layout_below="@id/commLayout"
+        android:layout_marginTop="65dp"
+        android:gravity="center"
+        android:padding="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/btnEmptyLayout"
+            android:layout_width="60dp"
+            android:layout_height="60dp"/>
+        <TextView
+            android:gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="22dp"
+            android:text="@string/listEmpty"/>
+    </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/btnLayout"
         android:layout_gravity="bottom|end"
         android:layout_alignParentBottom="true"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/borderbottom_gray">
+        android:background="@drawable/bordertop_gray"
+        android:elevation="5dp">
         <Button
             android:id="@+id/btnStart"
             android:text="@string/start"
             android:textColor="@android:color/white"
             android:backgroundTint="@color/green"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </RelativeLayout>
