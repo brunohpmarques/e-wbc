@@ -43,5 +43,12 @@ public class CommandOptionHolder extends RecyclerView.ViewHolder  {
                 Snackbar.make(view, commandTitle.getText()+" "+view.getContext().getString(R.string.added), Snackbar.LENGTH_SHORT).show();
             }
         });
+        commandImage.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                Snackbar.make(view, commandTitle.getText(), Snackbar.LENGTH_SHORT).show();
+                return false;
+            }
+        });
     }
 }
