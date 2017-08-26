@@ -38,7 +38,8 @@ public class Command implements Serializable {
     }
 
     public String getCodeFormatted(){
-        return code.getLabel()+"#"+param;
+        return code.getLabel();
+//        return code.getLabel()+"#"+param;
     }
 
     public String getInfo(Context ctx){

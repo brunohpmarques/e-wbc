@@ -7,12 +7,13 @@ import br.com.brunohpmarques.ewbc.R;
  */
 
 public enum ECommandCode {
-    ACELERAR("AC","Acelerar", R.drawable.ic_arrow_up, R.string.commandAC),
-    RE("RE","Ré",R.drawable.ic_arrow_down, R.string.commandRE),
-    DIREITA("DI","Direita",R.drawable.ic_arrow_forward, R.string.commandDI),
-    ESQUERDA("ES","Esquerda",R.drawable.ic_arrow_back, R.string.commandES),
-    SUGAR("SU","Sugar",R.drawable.ic_publish, R.string.commandSU),
-    SOLTAR("SO","Soltar",R.drawable.ic_file_download, R.string.commandSO);
+    ACELERAR("W","Acelerar", R.drawable.ic_arrow_up, R.string.commandAC),
+    RE("S","Ré",R.drawable.ic_arrow_down, R.string.commandRE),
+    DIREITA("D","Direita",R.drawable.ic_arrow_forward, R.string.commandDI),
+    ESQUERDA("A","Esquerda",R.drawable.ic_arrow_back, R.string.commandES),
+    CHUTAR("K","Chutar",R.drawable.ic_gavel, R.string.commandCH);
+//    SUGAR("SU","Sugar",R.drawable.ic_publish, R.string.commandSU),
+//    SOLTAR("SO","Soltar",R.drawable.ic_file_download, R.string.commandSO);
 
     private String label;
     private String title;

@@ -184,6 +184,9 @@ public class MainActivity extends AppCompatActivity {
         draw = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bluetooth_connected, null).mutate();
         bltConnected.setIcon(draw);
 
+        if(bt != null && bt.isOn()){
+            setIcBluetooth(R.id.btnBltActivated);
+        }
         return true;
     }
 
@@ -416,12 +419,11 @@ public class MainActivity extends AppCompatActivity {
                         //
 
                         // Enviar todos de 1 vez
-                        message = "[";
+                        message = "#"+total;
                         for (int i = total - 1; i >= 0; i--) {
-                            message += "\"" + MainActivity.mainList.get(i).getCodeFormatted() + "\",";
+                            message += MainActivity.mainList.get(i).getCodeFormatted();
                         }
-                        message = message.substring(0, message.length() - 1);
-                        message = message + "]";
+                        message = message + "#";
                         Log.i("sendCommands", total + ": " + message);
                         bt.sendMessage(message);
 

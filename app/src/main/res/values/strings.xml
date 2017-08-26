@@ -21,6 +21,7 @@
     <string name="commandES">Este comando faz o robô virar para a esquerda.</string>
     <string name="commandSU">Este comando faz o robô sugar um objeto do mapa.</string>
     <string name="commandSO">Este comando faz o robô soltar um objeto do mapa.</string>
+    <string name="commandCH">Este comando faz o robô chutar um objeto para fora do mapa.</string>
     <string name="sending">Enviando</string>
     <string name="sended">Comandos enviandos</string>
     <string name="ok">Ok</string>
