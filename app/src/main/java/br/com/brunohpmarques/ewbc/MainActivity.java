@@ -419,7 +419,7 @@ public class MainActivity extends AppCompatActivity {
                         //
 
                         // Enviar todos de 1 vez
-                        message = "#"+total;
+                        message = "$"+total;
                         for (int i = total - 1; i >= 0; i--) {
                             message += MainActivity.mainList.get(i).getCodeFormatted();
                         }

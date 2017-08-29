@@ -8,7 +8,7 @@ import br.com.brunohpmarques.ewbc.R;
 
 public enum ECommandCode {
     ACELERAR("W","Acelerar", R.drawable.ic_arrow_up, R.string.commandAC),
-    RE("S","Ré",R.drawable.ic_arrow_down, R.string.commandRE),
+//    RE("S","Ré",R.drawable.ic_arrow_down, R.string.commandRE),
     DIREITA("D","Direita",R.drawable.ic_arrow_forward, R.string.commandDI),
     ESQUERDA("A","Esquerda",R.drawable.ic_arrow_back, R.string.commandES),
     CHUTAR("K","Chutar",R.drawable.ic_gavel, R.string.commandCH);
