@@ -20,33 +20,33 @@ typedef enum { NO_COLOR, RED, GREEN, BLUE } colors;
 // estado atual
 states currentState = NONE;
 
-// cor atual (LED/objeto)
+// cor atual (objeto)
 colors currentColor = NO_COLOR;
 
 void setup() {
     // TODO: setar pinos de entrada e saída
 
-    Serial.begin(9600);
+    Serial1.begin(9600);
 }
 
 void moveForward() {
     // TODO: andar para frente até detectar algo
-    Serial.println("Andar para frente");
+    Serial1.println("Andar para frente");
 }
 
 void turnLeft() {
     // TODO
-    Serial.println("Virar para esquerda");
+    Serial1.println("Virar para esquerda");
 }
 
 void turnRight() {
     // TODO
-    Serial.println("Virar para direita");
+    Serial1.println("Virar para direita");
 }
 
 void kickObject() {
     // TODO: andar e chutar objeto
-    Serial.println("Chutar objeto");
+    Serial1.println("Chutar objeto");
 }
 
 void processCommandQueue() {
@@ -75,15 +75,15 @@ void processIncomingByte(const char b) {
         
 //        else {
 //            if (b == '1') {
-//                Serial.print(b);
+//                Serial1.print(b);
 //                
 //                currentColor = RED;
 //            } else if (b == '2') {
-//                Serial.print(b);
+//                Serial1.print(b);
 //                
 //                currentColor = GREEN;
 //            } else if (b == '3') {
-//                Serial.print(b);
+//                Serial1.print(b);
 //                
 //                currentColor = BLUE;
 //            }
@@ -95,24 +95,24 @@ void processIncomingByte(const char b) {
 
         if (currentState == NONE) {
             if (b == '$') {
-                Serial.print(b);
+                Serial1.print(b);
             
                 currentState = READ_NUM_COMMANDS;
             }
         } else if (currentState == READ_COMMANDS) {
             if (b == 'W' || b == 'A' || b == 'D' || b == 'K') {
-                Serial.print(b);
+                Serial1.print(b);
 
                 commandQueue[numCommandsFound++] = b;
             } else if (b == '#') {
                 if (numCommandsReal == numCommandsFound) {
-                    Serial.println(b);
+                    Serial1.println(b);
 
                     currentState = READY;
                 } else {
                     // erro de transmissão
                     // TODO: pedir reenvio?
-                    Serial.println("E");
+                    Serial1.println("E");
 
                     numCommandsReal = 0;
                     currentState = NONE;
@@ -125,15 +125,16 @@ void processIncomingByte(const char b) {
 }
 
 void loop() {
-    if (Serial.available() > 0) {
-        data = Serial.read();
+    if (Serial1.available() > 0) {
+        data = Serial1.read();
         
-        processIncomingByte(data);
+//         processIncomingByte(data);
+        
+        Serial.println(data);
     }
 
-    if (currentState == READY) {
-        // executar fila de comandos
-        processCommandQueue();
-    }
+//     if (currentState == READY) {
+//         // executar fila de comandos
+//         processCommandQueue();
+//     }
 }
-
