@@ -27,7 +27,7 @@ void loop()
     //Detecta a cor
     color();
     //Mostra valores no serial monitor
-    Serial.print("Vermelho :");
+    Serial.print("Vermelho: ");
     Serial.print(red, DEC);
     Serial.print(" Verde : ");
     Serial.print(green, DEC);
@@ -35,26 +35,31 @@ void loop()
     Serial.print(blue, DEC);
     Serial.println();
   
-    //Verifica se a cor vermelha foi detectada
-    if (red < blue && red < green && red < 100)
+    if (red > 400 && green > 400 && blue > 400) {
+        Serial.println("Preto");
+    }
+
+    else if (red < 200 && green < 150 && blue < 100) {
+        Serial.println("Azul claro");
+    }
+
+    else if (red < 200 && green < 200 && blue < 200) {
+        Serial.println("Branco");
+    }
+    
+    else if (red < blue && red < green && red < 200 && green > 250 && blue > 150)
     {
       Serial.println("Vermelho");
     }
   
     //Verifica se a cor azul foi detectada
-    else if (blue < red && blue < green && blue < 1000)
+    else if (blue < red && blue < green && red > 400)
     {
       Serial.println("Azul");
     }
   
-    //Verifica se a cor verde foi detectada
-    else if (green < red && green < blue)
-    {
-      Serial.println("Verde");
-    }
-  
     Serial.println();
-    delay(1000);
+    delay(500);
 }
 
 void color()
